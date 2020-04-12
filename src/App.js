@@ -43,9 +43,9 @@ class App extends Component {
       .then(response => {
           this.setState({
             question: response.data.question,
-            correctAnswer: response.data.answer,
+            correctAnswer: response.data.answer.toLowerCase(),
             inputText: '',
-            userAnswer: '',
+            userAnswer: null,
             incorrect: ''
           })
           console.log(response);
