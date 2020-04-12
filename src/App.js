@@ -1,26 +1,102 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {Component} from 'react';
+import axios from 'axios';
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+class App extends Component {
+  state = {
+    question: '',
+    correctAnswer: '',
+    inputText: '',
+    userAnswer: null,
+    incorrect: ''
+  }
+  
+  componentDidMount() {
+    axios.get('https://trivalicious.herokuapp.com/any/random')
+      .then(response => {
+          this.setState({
+            question: response.data.question,
+            correctAnswer: response.data.answer.toLowerCase()
+          })
+          console.log(response);
+      });
+  }  
+  
+  onChangeHandler = (event) => {
+    this.setState({
+      inputText: event.target.value
+    });
+  }
+  
+  onClickHandler = () => {
+    this.setState({
+      userAnswer: this.state.inputText.toLowerCase()
+    });
+    if(this.state.inputText !== this.state.userAnswer) {
+      this.setState({incorrect: 'Incorrect'})
+    }
+  }
+  
+  nextQuestionHandler = () => {
+      axios.get('https://trivalicious.herokuapp.com/any/random')
+      .then(response => {
+          this.setState({
+            question: response.data.question,
+            correctAnswer: response.data.answer,
+            inputText: '',
+            userAnswer: '',
+            incorrect: ''
+          })
+          console.log(response);
+      }); 
+  }
+  
+  
+  render() {
+    return (
+      <div>
+        <nav className="navbar navbar-dark bg-dark">
+          <span className="navbar-brand mb-0 h1">Trivalicious</span>
+        </nav>
+        <div className="container">
+          <div className="row">
+            <div className="col-md-8">
+              <p id="question">{this.state.question}</p>
+              <div className="input-group mb-3">
+                <input
+                  onChange={this.onChangeHandler}
+                  type="text" 
+                  className="form-control" 
+                  placeholder="answer..." 
+                  aria-label="answer" 
+                  aria-describedby="basic-addon2" 
+                  value={this.state.inputText} />
+                <div className="input-group-append">
+                  <button 
+                    onClick={this.onClickHandler}
+                    className="btn btn-outline-success" 
+                    type="button">Submit</button>
+                  <button
+                    onClick={this.nextQuestionHandler}
+                    className="btn btn-block btn-outline-danger">
+                    Next Question</button>
+                </div>
+                
+              </div>
+            </div>
+          </div>
+          <div className="row">
+            <div className="col-md-8">
+              {(this.state.correctAnswer.includes(this.state.userAnswer)) ? <h1 id="green">Correct</h1> 
+                : <h1 id="red">{this.state.incorrect}</h1> 
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    );    
+  }
 }
 
 export default App;
