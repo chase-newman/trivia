@@ -1,7 +1,10 @@
 import React, {Component} from 'react';
 import axios from 'axios';
 import './App.css';
-
+import Header from './HeaderComponent/Header';
+import Question from './QuestionComponent/Question'
+import ScoreCounter from './ScoreCounter/ScoreCounter';
+import Result from './ResultComponent/Result';
 
 class App extends Component {
   state = {
@@ -9,7 +12,8 @@ class App extends Component {
     correctAnswer: '',
     inputText: '',
     userAnswer: null,
-    incorrect: ''
+    incorrect: '',
+    userScore: 0
   }
   
   componentDidMount() {
@@ -32,11 +36,22 @@ class App extends Component {
   onClickHandler = () => {
     this.setState({
       userAnswer: this.state.inputText.toLowerCase()
-    });
+    })
+    console.log(this.state.inputText.toLowerCase());
+    
+    if(this.state.correctAnswer.includes(this.state.inputText.toLowerCase())) {
+      console.log("YOU SHOULD GET A POINT");
+      this.setState((prevState) => {
+        return {userScore: prevState.userScore + 1}
+      })
+    }
+    
     if(this.state.inputText !== this.state.userAnswer) {
       this.setState({incorrect: 'Incorrect'})
     }
   }
+  
+  
   
   nextQuestionHandler = () => {
       axios.get('https://trivalicious.herokuapp.com/any/random')
@@ -49,48 +64,33 @@ class App extends Component {
             incorrect: ''
           })
           console.log(response);
-      }); 
+        }); 
   }
   
   
   render() {
     return (
       <div>
-        <nav className="navbar navbar-dark bg-dark">
-          <span className="navbar-brand mb-0 h1">Trivalicious</span>
-        </nav>
-        <div className="container">
-          <div className="row">
-            <div className="col-md-8">
-              <p id="question">{this.state.question}</p>
-              <div className="input-group mb-3">
-                <input
-                  onChange={this.onChangeHandler}
-                  type="text" 
-                  className="form-control" 
-                  placeholder="answer..." 
-                  aria-label="answer" 
-                  aria-describedby="basic-addon2" 
-                  value={this.state.inputText} />
-                <div className="input-group-append">
-                  <button 
-                    onClick={this.onClickHandler}
-                    className="btn btn-outline-success" 
-                    type="button">Submit</button>
-                  <button
-                    onClick={this.nextQuestionHandler}
-                    className="btn btn-block btn-outline-danger">
-                    Next Question</button>
-                </div>
-                
-              </div>
+        <Header />
+          <div className="container">
+            <div className="row">
+              <Question 
+                question={this.state.question}
+                onChangeHandler={this.onChangeHandler}
+                value={this.state.inputText}
+                onClickHandler={this.onClickHandler}
+                nextQuestionHandler={this.nextQuestionHandler}
+                />
             </div>
-          </div>
           <div className="row">
-            <div className="col-md-8">
-              {(this.state.correctAnswer.includes(this.state.userAnswer)) ? <h1 id="green">Correct</h1> 
-                : <h1 id="red">{this.state.incorrect}</h1> 
-              }
+              <Result 
+                correctAnswer={this.state.correctAnswer}
+                userAnswer={this.state.userAnswer}
+                incorrect={this.state.incorrect}/>
+          </div>
+          <div className="row align-center">
+            <div className="col-md-4">
+              <ScoreCounter userScore={this.state.userScore}/>
             </div>
           </div>
         </div>
