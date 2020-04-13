@@ -1,0 +1,7 @@
+.ScoreCounter {
+  font-size: 32px;
+  border: 2px solid rgb(155,80,120);
+  background: rgb(155,80,120);
+  padding: 10px;
+  border-radius: 10px;
+}
